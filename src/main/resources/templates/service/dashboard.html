@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Dashboard</title>
+</head>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    h1 {
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    h2 {
+        color: #555;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
+    .cards {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        flex: 1;
+        min-width: 200px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid #007bff;
+    }
+
+    .card.success {
+        border-left-color: #51cf66;
+    }
+
+    .card.warning {
+        border-left-color: #ffd93d;
+    }
+
+    .card h3 {
+        margin: 0;
+        color: #555;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card p {
+        font-size: 32px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #333;
+    }
+
+    .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th,
+    table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    table th {
+        background: #f8f8f8;
+        font-weight: bold;
+        color: #333;
+    }
+
+    table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 20px;
+        color: #999;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+
+    <div class="container">
+
+        <h1>Service Dashboard</h1>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Services</h3>
+                <p id="totalServices">0</p>
+            </div>
+
+            <div class="card success">
+                <h3>Total Maintenance Cost</h3>
+                <p id="totalMaintenanceCost">--</p>
+            </div>
+
+            <div class="card warning">
+                <h3>Upcoming Services</h3>
+                <p id="upcomingServicesCount">0</p>
+            </div>
+
+        </div>
+
+        <div class="table-container">
+
+            <h2>All Service Records</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Record ID</th>
+                        <th>Vehicle VIN</th>
+                        <th>Service Type</th>
+                        <th>Service Date</th>
+                        <th>Odometer (km)</th>
+                        <th>Cost (Rs)</th>
+                        <th>Next Due Date</th>
+                    </tr>
+                </thead>
+                <tbody id="serviceTableBody">
+                    <tr>
+                        <td colspan="7" class="loading">Loading service records...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="table-container">
+
+            <h2>Upcoming Services</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Record ID</th>
+                        <th>Vehicle VIN</th>
+                        <th>Service Type</th>
+                        <th>Last Service Date</th>
+                        <th>Next Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="upcomingTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading upcoming services...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        async function loadServiceDashboard() {
+            try {
+                const response = await fetch('/api/service/dashboard');
+                const data = await response.json();
+
+                document.getElementById("totalServices").innerText = data.totalServices;
+                document.getElementById("totalMaintenanceCost").innerText =
+                    'Rs.' + data.totalMaintenanceCost.toFixed(2);
+                document.getElementById("upcomingServicesCount").innerText = data.upcomingServicesCount;
+
+            } catch (error) {
+                console.error("Dashboard Error:", error);
+                document.getElementById("totalMaintenanceCost").innerText = "Error";
+            }
+        }
+
+        async function loadServiceRecords() {
+            try {
+                const response = await fetch('/api/service/records');
+                const records = await response.json();
+
+                const tableBody = document.getElementById("serviceTableBody");
+                tableBody.innerHTML = "";
+
+                if (records.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="loading">No service records available</td></tr>';
+                    return;
+                }
+
+                records.forEach(record => {
+                    const row = `
+                        <tr>
+                            <td>${record.serviceRecordId}</td>
+                            <td>${record.vehicle ? record.vehicle.vin : 'N/A'}</td>
+                            <td>${record.serviceType}</td>
+                            <td>${record.serviceDate}</td>
+                            <td>${record.odometerReading}</td>
+                            <td>${record.serviceCost ? record.serviceCost.toFixed(2) : '0.00'}</td>
+                            <td>${record.nextServiceDueDate || 'N/A'}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error("Records Error:", error);
+                document.getElementById("serviceTableBody").innerHTML =
+                    '<tr><td colspan="7" class="loading">Error loading service records</td></tr>';
+            }
+        }
+
+        async function loadUpcomingServices() {
+            try {
+                const response = await fetch('/api/service/upcoming');
+                const records = await response.json();
+
+                const tableBody = document.getElementById("upcomingTableBody");
+                tableBody.innerHTML = "";
+
+                if (records.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="loading">No upcoming services</td></tr>';
+                    return;
+                }
+
+                const today = new Date();
+
+                records.forEach(record => {
+                    const dueDate = record.nextServiceDueDate ? new Date(record.nextServiceDueDate) : null;
+                    const isDue = dueDate && dueDate <= today;
+                    const statusLabel = isDue ? 'Overdue' : 'Scheduled';
+                    const statusStyle = isDue
+                        ? 'background-color:#f8d7da;color:#721c24;'
+                        : 'background-color:#d4edda;color:#155724;';
+
+                    const row = `
+                        <tr>
+                            <td>${record.serviceRecordId}</td>
+                            <td>${record.vehicle ? record.vehicle.vin : 'N/A'}</td>
+                            <td>${record.serviceType}</td>
+                            <td>${record.serviceDate}</td>
+                            <td>${record.nextServiceDueDate || 'N/A'}</td>
+                            <td><span class="badge" style="${statusStyle}">${statusLabel}</span></td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error("Upcoming Error:", error);
+                document.getElementById("upcomingTableBody").innerHTML =
+                    '<tr><td colspan="6" class="loading">Error loading upcoming services</td></tr>';
+            }
+        }
+
+        loadServiceDashboard();
+        loadServiceRecords();
+        loadUpcomingServices();
+
+    </script>
+
+</body>
+
+</html>
+

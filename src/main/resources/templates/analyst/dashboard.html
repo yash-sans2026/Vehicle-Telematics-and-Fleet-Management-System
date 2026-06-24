@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 220px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #007bff;
+        }
+
+        .card.success {
+            border-left-color: #51cf66;
+        }
+
+        .card.warning {
+            border-left-color: #ffd93d;
+        }
+
+        .card.info {
+            border-left-color: #15aabf;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background: #f8f8f8;
+            font-weight: bold;
+            color: #333;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Fuel Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Fuel Logs</h3>
+            <p id="totalFuelLogs">0</p>
+        </div>
+
+        <div class="card success">
+            <h3>Total Fuel Consumed</h3>
+            <p id="totalFuelConsumed">0.00 L</p>
+        </div>
+
+        <div class="card warning">
+            <h3>Total Fuel Cost</h3>
+            <p id="totalFuelCost">Rs. 0.00</p>
+        </div>
+
+        <div class="card info">
+            <h3>Average Refill</h3>
+            <p id="averageRefillAmount">0.00 L</p>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h2>All Fuel Logs</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Log ID</th>
+                <th>Vehicle VIN</th>
+                <th>Refill Date</th>
+                <th>Litres Refilled (L)</th>
+                <th>Odometer (km)</th>
+                <th>Cost (Rs)</th>
+            </tr>
+            </thead>
+            <tbody id="fuelLogTableBody">
+            <tr>
+                <td colspan="6" class="loading">Loading fuel logs...</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/fuel-logs/stats');
+            const data = await response.json();
+
+            document.getElementById('totalFuelLogs').innerText = data.totalFuelLogs ?? 0;
+            document.getElementById('totalFuelConsumed').innerText =
+                (data.totalFuelConsumed ?? 0).toFixed(2) + ' L';
+            document.getElementById('totalFuelCost').innerText =
+                'Rs.' + (data.totalFuelCost ?? 0).toFixed(2);
+            document.getElementById('averageRefillAmount').innerText =
+                (data.averageRefillAmount ?? 0).toFixed(2) + ' L';
+        } catch (error) {
+            console.error('Error loading fuel stats:', error);
+        }
+    }
+
+    async function loadFuelLogs() {
+        const tableBody = document.getElementById('fuelLogTableBody');
+
+        try {
+            const response = await fetch('/api/fuel-logs');
+            const logs = await response.json();
+
+            if (!Array.isArray(logs) || logs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="loading">No fuel logs found.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = logs.map(log => `
+                <tr>
+                    <td>${log.fuelLogId}</td>
+                    <td>${log.vehicle ? log.vehicle.vin : 'N/A'}</td>
+                    <td>${log.refillDate || 'N/A'}</td>
+                    <td>${log.litresRefilled != null ? log.litresRefilled.toFixed(2) : '0.00'}</td>
+                    <td>${log.odometerReading != null ? log.odometerReading : 'N/A'}</td>
+                    <td>${log.costAmount != null ? log.costAmount.toFixed(2) : '0.00'}</td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            tableBody.innerHTML = '<tr><td colspan="6" class="loading">Error loading fuel logs.</td></tr>';
+            console.error('Error loading fuel logs:', error);
+        }
+    }
+
+    loadStats();
+    loadFuelLogs();
+</script>
+
+</body>
+
+</html>

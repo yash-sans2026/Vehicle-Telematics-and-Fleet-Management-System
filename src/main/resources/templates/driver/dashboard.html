@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+</head>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+h1 {
+    margin-bottom: 25px;
+}
+
+.cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+    margin: 0;
+    color: #555;
+}
+
+.card p {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background: #f8f8f8;
+}
+</style>
+
+<body>
+
+    <div class="container">
+
+        <h1>Driver Dashboard</h1>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Driver</h3>
+                <p id="driverName">Loading...</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Trips</h3>
+                <p id="totalTrips">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Distance</h3>
+                <p id="totalDistance">0 KM</p>
+            </div>
+
+            <div class="card">
+                <h3>Driver Score</h3>
+                <p id="driverScore">0</p>
+            </div>
+
+        </div>
+
+        <div class="table-container">
+
+            <h2>Completed Trips</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Trip ID</th>
+                        <th>Vehicle</th>
+                        <th>Distance (KM)</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tripTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        async function loadDashboard() {
+
+            try {
+
+                const dashboardResponse =
+                    await fetch('/api/driver/dashboard');
+
+                const dashboardData =
+                    await dashboardResponse.json();
+
+                document.getElementById("driverName").innerText =
+                    dashboardData.driver.username;
+
+                document.getElementById("totalTrips").innerText =
+                    dashboardData.totalTrips;
+
+                document.getElementById("totalDistance").innerText =
+                    dashboardData.totalDistance.toFixed(2) + " KM";
+
+            } catch (error) {
+
+                console.error("Dashboard Error:", error);
+
+            }
+        }
+
+        async function loadDriverScore() {
+
+            try {
+
+                const response =
+                    await fetch('/api/driver/scores');
+
+                const scores =
+                    await response.json();
+
+                if (scores.length > 0) {
+
+                    document.getElementById("driverScore").innerText =
+                        scores[0].safetyScore;
+
+                }
+
+            } catch (error) {
+
+                console.error("Score Error:", error);
+
+            }
+        }
+
+        async function loadTrips() {
+
+            try {
+
+                const response =
+                    await fetch('/api/driver/trips');
+
+                const trips =
+                    await response.json();
+
+                const tableBody =
+                    document.getElementById("tripTableBody");
+
+                tableBody.innerHTML = "";
+
+                trips.forEach(trip => {
+
+                    let row = `
+                        <tr>
+                            <td>${trip.tripId}</td>
+                            <td>${trip.vehicle.vehicleType}</td>
+                            <td>${trip.distanceKm.toFixed(2)}</td>
+                            <td>${trip.startTime}</td>
+                            <td>${trip.endTime}</td>
+                            <td>${trip.tripStatus}</td>
+                        </tr>
+                    `;
+
+                    tableBody.innerHTML += row;
+
+                });
+
+            } catch (error) {
+
+                console.error("Trips Error:", error);
+
+            }
+        }
+
+        loadDashboard();
+        loadDriverScore();
+        loadTrips();
+
+    </script>
+
+</body>
+
+</html>

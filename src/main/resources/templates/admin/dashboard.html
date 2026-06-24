@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body{
+            background:#f4f6f9;
+            padding:30px;
+        }
+
+        h1{
+            margin-bottom:20px;
+            color:#333;
+        }
+
+        .quick-access {
+            margin-bottom:30px;
+        }
+
+        .quick-access h2 {
+            margin-bottom:16px;
+            color:#333;
+            font-size:22px;
+        }
+
+        .quick-access-buttons {
+            display:flex;
+            flex-wrap:wrap;
+            gap:14px;
+        }
+
+        .dashboard-link {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:200px;
+            padding:12px 18px;
+            border:none;
+            border-radius:8px;
+            background:#007bff;
+            color:white;
+            font-weight:600;
+            font-size:15px;
+            cursor:pointer;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+            transition:background 0.2s ease, transform 0.2s ease;
+        }
+
+        .dashboard-link:hover {
+            background:#0056b3;
+            transform:translateY(-1px);
+        }
+
+        .dashboard-container{
+            display:flex;
+            gap:20px;
+            flex-wrap:wrap;
+        }
+
+        .card{
+            background:white;
+            width:250px;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h3{
+            color:#666;
+            margin-bottom:10px;
+        }
+
+        .card p{
+            font-size:32px;
+            font-weight:bold;
+            color:#007bff;
+        }
+        .table-section {
+            margin-top:40px;
+        }
+
+        .table-section h2 {
+            margin-bottom:16px;
+            color:#333;
+        }
+
+        .table-wrapper {
+            overflow-x:auto;
+            background:white;
+            border-radius:10px;
+            padding:16px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            min-width:720px;
+        }
+
+        th, td {
+            padding:14px 12px;
+            text-align:left;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        th {
+            background:#f8f9fb;
+            color:#555;
+            font-weight:700;
+        }
+
+        tr:hover {
+            background:#f1f5f9;
+        }
+
+        td {
+            color:#4b5563;
+        }    </style>
+
+</head>
+<body>
+
+    <h1>Admin Dashboard</h1>
+
+    <section class="quick-access">
+        <h2>Quick Access</h2>
+        <div class="quick-access-buttons">
+            <button type="button" class="dashboard-link" onclick="window.location.href='/analyst/dashboard'">Analyst Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/driver/dashboard'">Driver Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/safety/dashboard'">Safety Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/service/dashboard'">Service Dashboard</button>
+        </div>
+    </section>
+
+    <div class="dashboard-container">
+
+        <div class="card">
+            <h3>Total Users</h3>
+            <p id="totalUsers">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Vehicles</h3>
+            <p id="totalVehicles">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Trips</h3>
+            <p id="totalTrips">0</p>
+        </div>
+
+    </div>
+
+    <section class="table-section">
+        <h2>All Users</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr>
+                        <td colspan="4">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+
+        async function loadDashboard() {
+
+            try {
+
+                const response =
+                    await fetch('/api/admin/dashboard');
+
+                const data =
+                    await response.json();
+
+                document.getElementById("totalUsers")
+                        .innerText = data.totalUsers;
+
+                document.getElementById("totalVehicles")
+                        .innerText = data.totalVehicles;
+
+                document.getElementById("totalTrips")
+                        .innerText = data.totalTrips;
+
+            } catch(error) {
+
+                console.error(
+                    "Error loading dashboard",
+                    error
+                );
+            }
+        }
+
+        loadDashboard();
+        loadUsers();
+
+        async function loadUsers() {
+            const body = document.getElementById('userTableBody');
+
+            try {
+                const response = await fetch('/api/admin/users');
+                const users = await response.json();
+
+                if (!Array.isArray(users) || users.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4">No users found.</td></tr>';
+                    return;
+                }
+
+                body.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.user_id}</td>
+                        <td>${user.username || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>${user.role || ''}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                body.innerHTML = '<tr><td colspan="4">Unable to load users.</td></tr>';
+                console.error('Error loading users', error);
+            }
+        }
+
+    </script>
+
+</body>
+</html>

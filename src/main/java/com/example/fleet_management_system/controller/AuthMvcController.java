@@ -1,0 +1,14 @@
+package com.example.fleet_management_system.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+
+@Controller
+public class AuthMvcController {
+
+    @GetMapping("/")
+    public String showLoginPage() {
+        return "login";
+    }
+}

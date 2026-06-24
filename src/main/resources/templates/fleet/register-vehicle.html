@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management - Register Vehicle</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0d6efd, #4f9cff);
+            margin: 0;
+            padding: 24px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 580px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .quick-access {
+            margin-bottom: 20px;
+        }
+
+        .quick-access h3 {
+            margin: 0 0 12px;
+            color: #333;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .quick-access-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .dashboard-link {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #0d6efd;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .dashboard-link:hover {
+            background: #0b5ed7;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        input:focus {
+            border-color: #0d6efd;
+            outline: none;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .submit-button {
+            grid-column: span 2;
+            padding: 12px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .submit-button:hover {
+            background: #0b5ed7;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+        }
+
+        .success {
+            background: #e7f7ed;
+            color: #176c3a;
+        }
+
+        .error {
+            background: #fdeaea;
+            color: #a42828;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header small {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>Register Vehicle</h2>
+        <small>Fleet Management System</small>
+    </div>
+
+    <section class="quick-access">
+        <h3>Quick Access</h3>
+        <div class="quick-access-buttons">
+            <button type="button" class="dashboard-link" onclick="window.location.href='/analyst/dashboard'">Analyst Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/driver/dashboard'">Driver Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/safety/dashboard'">Safety Dashboard</button>
+            <button type="button" class="dashboard-link" onclick="window.location.href='/service/dashboard'">Service Dashboard</button>
+        </div>
+    </section>
+
+    <form id="vehicleForm">
+        <input type="text" name="vin" placeholder="VIN (Vehicle Identification Number)" required>
+
+        <input type="text" name="registrationNumber" placeholder="Registration Number" required>
+
+        <input type="text" name="vehicleType" placeholder="Vehicle Type (Truck, Car...)" required>
+
+        <input type="text" name="deviceImei" placeholder="Device IMEI" required>
+
+        <input type="email" name="fleetManagerEmail" placeholder="Fleet Manager Email" class="full-width" required>
+
+        <button type="submit" class="submit-button">Register Vehicle</button>
+    </form>
+
+    <div id="messageBox" class="message"></div>
+</div>
+
+<script>
+    const form = document.getElementById('vehicleForm');
+    const messageBox = document.getElementById('messageBox');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        // Disable button during submission
+        const button = form.querySelector('button');
+        button.textContent = "Registering...";
+        button.disabled = true;
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/api/fleet/vehicles', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+
+            const data = await response.json();
+
+            messageBox.style.display = 'block';
+            messageBox.className = 'message ' + (data.success ? 'success' : 'error');
+            messageBox.textContent = data.message || 'Something went wrong';
+
+            if (data.success) {
+                form.reset();
+            }
+
+        } catch (error) {
+            messageBox.style.display = 'block';
+            messageBox.className = 'message error';
+            messageBox.textContent = 'Server error. Please try again.';
+        } finally {
+            button.textContent = "Register Vehicle";
+            button.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
