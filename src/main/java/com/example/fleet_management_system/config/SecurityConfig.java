@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/service/**", "/api/service/**").hasAnyRole(ADMIN, FLEET_MANAGER, SERVICE_ENGINEER)
                         .requestMatchers("/safety/**", "/api/safety/**").hasAnyRole(ADMIN, FLEET_MANAGER, SAFETY_OFFICER)
                         .requestMatchers("/analyst/**", "/api/fuel-logs", "/api/fuel-logs/**").hasAnyRole(ADMIN, FLEET_MANAGER, OPERATIONS_ANALYST)
+                        .requestMatchers("/trip/**", "/api/trips/**").hasAnyRole(ADMIN, FLEET_MANAGER, DRIVER, SAFETY_OFFICER)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

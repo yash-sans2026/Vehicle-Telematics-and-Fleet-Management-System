@@ -7,7 +7,6 @@ import com.example.fleet_management_system.entity.User;
 import com.example.fleet_management_system.entity.Vehicle;
 import com.example.fleet_management_system.repository.UserRepository;
 import com.example.fleet_management_system.repository.VehicleRepository;
-// import com.example.fleet_management_system.utils.DummyTelemetryGenerator;
 import com.example.fleet_management_system.utils.DummyUserGenerator;
 import com.example.fleet_management_system.utils.DummyVehicleGenerator;
 
