@@ -1,5 +1,9 @@
 package com.example.fleet_management_system.config;
 import java.util.List;
+
+import com.example.fleet_management_system.service.TelemetrySimulationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,12 +17,11 @@ import com.example.fleet_management_system.utils.DummyVehicleGenerator;
 
 @Configuration // It is used to indicate that this class is a configuration class. It will be picked up by Spring Boot and executed at startup
 public class DataLoader implements CommandLineRunner {
-   
     private UserRepository userRepository;
     private DummyUserGenerator userGenerator;
     private VehicleRepository vehicleRepository;
     private DummyVehicleGenerator vehicleGenerator;
-
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     public DataLoader(UserRepository userRepository, DummyUserGenerator userGenerator, VehicleRepository vehicleRepository, DummyVehicleGenerator vehicleGenerator) {
         this.userRepository = userRepository;
@@ -34,7 +37,7 @@ public class DataLoader implements CommandLineRunner {
         loadVehicles();
 
 
-        System.out.println("Dummy data loaded successfully.");
+        logger.info("DataLoader has finished loading dummy data.");
     }
 
     private void loadUsers() {
@@ -42,7 +45,7 @@ public class DataLoader implements CommandLineRunner {
 
             List<User> users = userGenerator.generateUsers();
             userRepository.saveAll(users);
-            System.out.println("Dummy users inserted.");
+            logger.info("Dummy users inserted.");
         }
     }
 
@@ -52,7 +55,7 @@ public class DataLoader implements CommandLineRunner {
 
             List<Vehicle> vehicles = vehicleGenerator.generateVehicles();
             vehicleRepository.saveAll(vehicles);
-            System.out.println("Dummy vehicles inserted.");
+            logger.info("Dummy vehicles inserted.");
         }
     }
 }

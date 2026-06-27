@@ -2,10 +2,7 @@ package com.example.fleet_management_system.entity;
 
 import com.example.fleet_management_system.entity.enums.VehicleStatus;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Vehicle {
@@ -17,6 +14,7 @@ public class Vehicle {
     private int registrationNumber;
     private String vehicleType;
     private String deviceImei;
+    @Enumerated(EnumType.STRING)
     private VehicleStatus vehicleStatus;
 
     public Vehicle(String vin, int registrationNumber, String vehicleType, String deviceImei, VehicleStatus vehicleStatus) {

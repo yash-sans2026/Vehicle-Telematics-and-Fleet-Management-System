@@ -3,6 +3,8 @@ package com.example.fleet_management_system.utils;
 import java.time.LocalDate;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.fleet_management_system.entity.DriverScore;
@@ -13,6 +15,7 @@ import com.example.fleet_management_system.entity.Vehicle;
 public class DummyDriverScoreGenerator {
 
     private final Random random = new Random();
+    private static final Logger logger = LoggerFactory.getLogger(DummyDriverScoreGenerator.class);
 
     public DriverScore generate(User driver, Vehicle vehicle) {
 
@@ -50,6 +53,7 @@ public class DummyDriverScoreGenerator {
                 Math.round(safetyScore * 100.0) / 100.0
         );
 
+        logger.info("Generated dummy driver score for driver");
         return score;
     }
 }

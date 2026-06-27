@@ -1,6 +1,9 @@
 package com.example.fleet_management_system.utils;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.fleet_management_system.entity.User;
@@ -8,6 +11,7 @@ import com.example.fleet_management_system.entity.enums.Role;
 
 @Component
 public class DummyUserGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(DummyUserGenerator.class);
 public List<User> generateUsers() {
 
         List<User> users = new ArrayList<>();
@@ -54,6 +58,7 @@ public List<User> generateUsers() {
                 Role.OPERATIONS_ANALYST
         ));
 
+        logger.info("Generated dummy users for the fleet management system");
         return users;
     }  
 }

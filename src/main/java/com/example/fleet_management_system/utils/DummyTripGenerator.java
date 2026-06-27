@@ -3,6 +3,8 @@ package com.example.fleet_management_system.utils;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.fleet_management_system.entity.Trip;
@@ -15,6 +17,7 @@ import com.example.fleet_management_system.entity.enums.TripStatus;
 public class DummyTripGenerator {
 
     private final Random random = new Random();
+    private static final Logger logger = LoggerFactory.getLogger(DummyTripGenerator.class);
 
     private LocalDateTime lastTripEnd =
             LocalDateTime.now().minusDays(5);
@@ -50,6 +53,7 @@ public class DummyTripGenerator {
 
         lastTripEnd = end;
 
+        logger.info("Generated dummy trip for vehicle and driver");
         return trip;
     }
 }

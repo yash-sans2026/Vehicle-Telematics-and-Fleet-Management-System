@@ -4,12 +4,7 @@ import java.time.LocalDateTime;
 
 import com.example.fleet_management_system.entity.enums.TripStatus;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class Trip {
@@ -29,6 +24,8 @@ public class Trip {
     private LocalDateTime endTime;
 
     private Double distanceKm;
+
+    @Enumerated(EnumType.STRING)
     private TripStatus tripStatus;
 
     public Trip(Vehicle vehicle, User driver, LocalDateTime startTime, LocalDateTime endTime, Double distanceKm,

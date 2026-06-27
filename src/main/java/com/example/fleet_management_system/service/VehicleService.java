@@ -3,6 +3,8 @@ package com.example.fleet_management_system.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.fleet_management_system.entity.Telemetry;
@@ -20,6 +22,7 @@ public class VehicleService {
     private final VehicleRepository vehicleRepository;
     private final TelemetryRepository telemetryRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(VehicleService.class);
 
     public VehicleService(
             VehicleRepository vehicleRepository,
@@ -73,7 +76,7 @@ public class VehicleService {
         telemetry.setFuelLevel(100.0);
         telemetry.setRecordedAt(LocalDateTime.now());
         telemetryRepository.save(telemetry);
-
+        logger.info("Registered new vehicle with VIN");
         return savedVehicle;
     }
 }

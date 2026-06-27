@@ -3,6 +3,8 @@ package com.example.fleet_management_system.utils;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.fleet_management_system.entity.Telemetry;
@@ -12,6 +14,7 @@ import com.example.fleet_management_system.entity.Vehicle;
 public class DummyTelemetryGenerator {
 
     private final Random random = new Random(); // It is used to generate random telemetry data
+    private static final Logger logger = LoggerFactory.getLogger(DummyTelemetryGenerator.class);
 
     public Telemetry generate(Vehicle vehicle) {
 
@@ -30,6 +33,7 @@ public class DummyTelemetryGenerator {
         telemetry.setRecordedAt(
         LocalDateTime.now().minusMinutes(random.nextInt(30)));
 
+        logger.info("Generated dummy telemetry data for vehicle");
         return telemetry;
     }
 }
