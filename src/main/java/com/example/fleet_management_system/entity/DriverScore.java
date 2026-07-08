@@ -15,6 +15,7 @@ public class DriverScore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int scoreId;
 
+    // Create/use a foreign key column called driver_id in the driver_score table.
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private User driver;

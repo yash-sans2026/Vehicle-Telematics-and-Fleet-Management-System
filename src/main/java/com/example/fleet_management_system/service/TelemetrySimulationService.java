@@ -83,28 +83,30 @@ public class TelemetrySimulationService {
                     telemetryGenerator.generate(vehicle)
             );
 
+            double x = Math.random();
+
             // 20% chance to create Trip
-            if (Math.random() < 0.2 && driver != null) {
+            if (x < 0.2 && driver != null) {
                 tripRepository.save(
                         tripGenerator.generate(vehicle, driver)
                 );
             }
 
             // 10% chance to create Fuel Log
-            if (Math.random() < 0.1) {
+            if (x < 0.1) {
                 fuelLogRepository.save(
                         fuelLogGenerator.generate(vehicle)
                 );
             }
 
             // 5% chance to create Service Record
-            if (Math.random() < 0.05) {
+            if (x < 0.05) {
                 serviceRecordRepository.save(
                         serviceGenerator.generate(vehicle)
                 );
             }
 
-            if (Math.random() < 0.15 && driver != null) {
+            if (x < 0.2 && driver != null) {
                 driverScoreRepository.save(
                     driverScoreGenerator.generate(
                         driver,

@@ -30,14 +30,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/access-denied").permitAll()
                         .requestMatchers("/admin/**", "/api/admin/**").hasRole(ADMIN)
                         .requestMatchers("/fleet/**", "/api/fleet/**").hasAnyRole(ADMIN, FLEET_MANAGER)
-                        .requestMatchers("/driver/**", "/api/driver/**").hasAnyRole(ADMIN, FLEET_MANAGER, DRIVER)
+                        .requestMatchers("/driver/**", "/api/driver/**").hasAnyRole(ADMIN, FLEET_MANAGER, DRIVER, SAFETY_OFFICER)
                         .requestMatchers("/service/**", "/api/service/**").hasAnyRole(ADMIN, FLEET_MANAGER, SERVICE_ENGINEER)
                         .requestMatchers("/safety/**", "/api/safety/**").hasAnyRole(ADMIN, FLEET_MANAGER, SAFETY_OFFICER)
                         .requestMatchers("/analyst/**", "/api/fuel-logs", "/api/fuel-logs/**").hasAnyRole(ADMIN, FLEET_MANAGER, OPERATIONS_ANALYST)
-                        .requestMatchers("/trip/**", "/api/trips/**").hasAnyRole(ADMIN, FLEET_MANAGER, DRIVER, SAFETY_OFFICER)
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/access-denied")
                 )
                 .formLogin(form -> form
                         .loginPage("/")

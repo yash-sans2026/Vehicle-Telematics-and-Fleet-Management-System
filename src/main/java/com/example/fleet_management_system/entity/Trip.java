@@ -16,6 +16,7 @@ public class Trip {
     @JoinColumn(name = "vehicle_id") // Assuming Vehicle is the vehicle entity. one vehicle can have multiple trips 
     private Vehicle vehicle;         
 
+    // driver_id column in the current table (for example, trip or driver_score) is a foreign key that references the id column of the user table.
     @ManyToOne
     @JoinColumn(name = "driver_id") // Assuming User is the driver entity. one driver can have multiple trips
     private User driver;

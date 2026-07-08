@@ -129,6 +129,28 @@
         .header small {
             color: #666;
         }
+
+        #vehicleTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#vehicleTable th {
+    background: #0d6efd;
+    color: white;
+    padding: 10px;
+}
+
+#vehicleTable td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#vehicleTable tr:nth-child(even) {
+    background: #f5f5f5;
+}
     </style>
 </head>
 
@@ -168,47 +190,97 @@
     </form>
 
     <div id="messageBox" class="message"></div>
+
+
+    <div id="vehicleTableContainer" style="margin-top:20px;">
+        <h3>Registered Vehicles</h3>
+
+        <table id="vehicleTable" border="1" width="100%" cellspacing="0">
+            <thead>
+            <tr>
+                <th>VIN</th>
+                <th>Registration No</th>
+                <th>Vehicle Type</th>
+                <th>Device IMEI</th>
+            </tr>
+            </thead>
+
+            <tbody id="vehicleTableBody">
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
+
     const form = document.getElementById('vehicleForm');
-    const messageBox = document.getElementById('messageBox');
+const messageBox = document.getElementById('messageBox');
 
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault();
+form.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-        // Disable button during submission
-        const button = form.querySelector('button');
-        button.textContent = "Registering...";
-        button.disabled = true;
+    const button = form.querySelector('button');
+    button.textContent = "Registering...";
+    button.disabled = true;
 
-        const formData = new FormData(form);
+    const formData = new FormData(form);
 
-        try {
-            const response = await fetch('/api/fleet/vehicles', {
-                method: 'POST',
-                body: new URLSearchParams(formData)
-            });
+    try {
+        const response = await fetch('/api/fleet/vehicles', {
+            method: 'POST',
+            body: new URLSearchParams(formData)
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            messageBox.style.display = 'block';
-            messageBox.className = 'message ' + (data.success ? 'success' : 'error');
-            messageBox.textContent = data.message || 'Something went wrong';
+        messageBox.style.display = 'block';
+        messageBox.className = 'message ' + (data.success ? 'success' : 'error');
+        messageBox.textContent = data.message || 'Something went wrong';
 
-            if (data.success) {
-                form.reset();
-            }
-
-        } catch (error) {
-            messageBox.style.display = 'block';
-            messageBox.className = 'message error';
-            messageBox.textContent = 'Server error. Please try again.';
-        } finally {
-            button.textContent = "Register Vehicle";
-            button.disabled = false;
+        if (data.success) {
+            form.reset();
+            loadVehicles(); // Refresh the table
         }
-    });
+
+    } catch (error) {
+        messageBox.style.display = 'block';
+        messageBox.className = 'message error';
+        messageBox.textContent = 'Server error. Please try again.';
+        console.error(error);
+    } finally {
+        button.textContent = "Register Vehicle";
+        button.disabled = false;
+    }
+});
+
+async function loadVehicles() {
+    try {
+        const response = await fetch('/api/fleet/vehicles');
+        const vehicles = await response.json();
+
+        const tableBody = document.getElementById('vehicleTableBody');
+        tableBody.innerHTML = '';
+
+        vehicles.forEach(vehicle => {
+            const row = `
+                <tr>
+                    <td>${vehicle.vin}</td>
+                    <td>${vehicle.registrationNumber}</td>
+                    <td>${vehicle.vehicleType}</td>
+                    <td>${vehicle.deviceImei}</td>
+                </tr>
+            `;
+
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+
+    } catch (error) {
+        console.error('Error loading vehicles:', error);
+    }
+}
+
+// Load vehicles when page opens
+document.addEventListener('DOMContentLoaded', loadVehicles);
 </script>
 
 </body>

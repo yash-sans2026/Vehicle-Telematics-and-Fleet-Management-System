@@ -216,6 +216,7 @@
 
                 const tableBody = document.getElementById("serviceTableBody");
                 tableBody.innerHTML = "";
+                <!-- In this we remove all the existing rows before adding new rows -->
 
                 if (records.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="7" class="loading">No service records available</td></tr>';
@@ -243,6 +244,7 @@
                     '<tr><td colspan="7" class="loading">Error loading service records</td></tr>';
             }
         }
+
 
         async function loadUpcomingServices() {
             try {

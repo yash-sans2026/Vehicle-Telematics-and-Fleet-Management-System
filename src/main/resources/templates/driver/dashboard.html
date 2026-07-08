@@ -133,9 +133,7 @@ table th {
     <script>
 
         async function loadDashboard() {
-
             try {
-
                 const dashboardResponse =
                     await fetch('/api/driver/dashboard');
 
@@ -152,9 +150,7 @@ table th {
                     dashboardData.totalDistance.toFixed(2) + " KM";
 
             } catch (error) {
-
                 console.error("Dashboard Error:", error);
-
             }
         }
 
