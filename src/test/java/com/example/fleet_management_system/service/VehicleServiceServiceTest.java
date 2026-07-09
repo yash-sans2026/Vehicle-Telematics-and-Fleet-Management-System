@@ -51,9 +51,7 @@ public class VehicleServiceServiceTest {
     @Test
     void testGetAllServiceRecords() {
         List<ServiceRecord> records = Arrays.asList(record1, record2);
-
         when(serviceRecordRepository.findAll()).thenReturn(records);
-
         List<ServiceRecord> result = vehicleServiceService.getAllServiceRecords();
 
         assertNotNull(result);

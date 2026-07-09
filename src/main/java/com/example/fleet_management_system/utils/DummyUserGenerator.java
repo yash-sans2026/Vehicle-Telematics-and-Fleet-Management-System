@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.example.fleet_management_system.entity.User;
@@ -11,54 +12,60 @@ import com.example.fleet_management_system.entity.enums.Role;
 
 @Component
 public class DummyUserGenerator {
+    private final PasswordEncoder passwordEncoder;
+
+    public DummyUserGenerator(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(DummyUserGenerator.class);
-public List<User> generateUsers() {
+    public List<User> generateUsers() {
 
         List<User> users = new ArrayList<>();
 
         users.add(new User(
                 "Admin User",
                 "admin@gmail.com",
-                "admin123",
+                passwordEncoder.encode("admin123"),
                 Role.ADMIN
         ));
 
         users.add(new User(
                 "Fleet Manager",
                 "fleet@gmail.com",
-                "fleet123",
+                passwordEncoder.encode("fleet123"),
                 Role.FLEET_MANAGER
         ));
 
         users.add(new User(
                 "Driver One",
                 "driver@gmail.com",
-                "driver123",
+                passwordEncoder.encode("driver123"),
                 Role.DRIVER
         ));
 
         users.add(new User(
                 "Safety Officer",
                 "safety@gmail.com",
-                "safety123",
+                passwordEncoder.encode("safety123"),
                 Role.SAFETY_OFFICER
         ));
 
         users.add(new User(
                 "Service Engineer",
                 "service@gmail.com",
-                "service123",
+                passwordEncoder.encode("service123"),
                 Role.SERVICE_ENGINEER
         ));
 
         users.add(new User(
                 "Operations Analyst",
                 "analyst@gmail.com",
-                "analyst123",
+                passwordEncoder.encode("analyst123"),
                 Role.OPERATIONS_ANALYST
         ));
 
         logger.info("Generated dummy users for the fleet management system");
         return users;
-    }  
+    }
 }

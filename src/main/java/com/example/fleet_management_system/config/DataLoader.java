@@ -1,7 +1,6 @@
 package com.example.fleet_management_system.config;
 import java.util.List;
 
-import com.example.fleet_management_system.service.TelemetrySimulationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

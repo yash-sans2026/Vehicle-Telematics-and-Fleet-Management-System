@@ -26,6 +26,7 @@ public class VehicleServiceController {
 
         Map<String, Object> response = new HashMap<>();
 
+        // String is best hashmap key, because it is immutable
         response.put("totalServices", vehicleServiceService.getTotalServices());
         response.put("totalMaintenanceCost", vehicleServiceService.getTotalMaintenanceCost());
         response.put("upcomingServicesCount", vehicleServiceService.getUpcomingServices().size());

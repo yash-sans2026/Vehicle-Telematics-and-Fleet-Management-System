@@ -10,12 +10,14 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
-
+//    The string "ROLE_" is prepended to a role name to create the authority string that the security framework uses for authorization checks.
     private static final String ROLE_PREFIX = "ROLE_";
     private static final String ADMIN = "ADMIN";
     private static final String FLEET_MANAGER = "FLEET_MANAGER";
@@ -65,7 +67,7 @@ public class SecurityConfig {
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
-                    .password(securityPassword(user.getPassword()))
+                    .password(user.getPassword())
                     .roles(user.getRole().name())
                     .build();
         };
@@ -74,17 +76,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler roleBasedSuccessHandler() {
         return (request, response, authentication) -> {
-            if (hasAuthority(authentication, role(ADMIN))) {
+            if (hasRole(authentication, ADMIN)) {
                 response.sendRedirect("/admin/dashboard");
-            } else if (hasAuthority(authentication, role(FLEET_MANAGER))) {
+            } else if (hasRole(authentication, FLEET_MANAGER)) {
                 response.sendRedirect("/fleet/vehicles/register");
-            } else if (hasAuthority(authentication, role(DRIVER))) {
+            } else if (hasRole(authentication, DRIVER)) {
                 response.sendRedirect("/driver/dashboard");
-            } else if (hasAuthority(authentication, role(SERVICE_ENGINEER))) {
+            } else if (hasRole(authentication, SERVICE_ENGINEER)) {
                 response.sendRedirect("/service/dashboard");
-            } else if (hasAuthority(authentication, role(SAFETY_OFFICER))) {
+            } else if (hasRole(authentication, SAFETY_OFFICER)) {
                 response.sendRedirect("/safety/dashboard");
-            } else if (hasAuthority(authentication, role(OPERATIONS_ANALYST))) {
+            } else if (hasRole(authentication, OPERATIONS_ANALYST)) {
                 response.sendRedirect("/analyst/dashboard");
             } else {
                 response.sendRedirect("/");
@@ -92,20 +94,19 @@ public class SecurityConfig {
         };
     }
 
-    private String securityPassword(String password) {
-        if (password != null && password.startsWith("{")) {
-            return password;
-        }
-
-        return "{noop}" + password;
-    }
-
-    private boolean hasAuthority(Authentication authentication, String authority) {
+    // This method checks whether the currently logged-in user has a specific role.
+    private boolean hasRole(Authentication authentication, String role) {
+        // Gets all roles/permissions of the logged-in user.
+        // Converts the list of roles into a stream so we can process them easily.
+        // Checks if at least one role matches the condition.
+        // Compares each authority with the required role.
         return authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> authority.equals(grantedAuthority.getAuthority()));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
 
-    private String role(String role) {
-        return ROLE_PREFIX + role;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
 }

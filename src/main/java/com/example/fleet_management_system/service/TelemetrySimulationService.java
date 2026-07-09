@@ -66,6 +66,8 @@ public class TelemetrySimulationService {
         this.serviceGenerator = serviceGenerator;
     }
 
+    // Logger is an interface from SLF4J.
+    // Passes the current class name to the logger.
     private static final Logger logger = LoggerFactory.getLogger(TelemetrySimulationService.class);
 
     @Scheduled(fixedRate = 5000)

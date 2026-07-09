@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fleet Management - Login</title>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
 <style>
     body {
@@ -130,12 +130,19 @@
         </form>
 
         <div class="error">
-            <p th:if="${param.error}">Invalid email or password</p>
-            <p th:text="${error}"></p>
+            <p id="errorMessage"></p>
         </div>
     </div>
 
 </div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
+    document.getElementById('errorMessage').textContent =
+    'Invalid email or password';
+    }
+</script>
 
 </body>
 </html>
